@@ -2705,8 +2705,14 @@ if(is800KHz) {
   if (is800KHz) {
 #endif
     uint32_t top = (F_CPU / 800000);       // 1.25µs
-    uint32_t t0 = top - (F_CPU / 2500000); // 0.4µs
-    uint32_t t1 = top - (F_CPU / 1250000); // 0.8µs
+	  
+//  uint32_t t0 = top - (F_CPU / 2500000); // 0.4µs  =>  actually need 0.35 µs but got 0.16 - 0.29 µs
+//  uint32_t t1 = top - (F_CPU / 1250000); // 0.8µs  =>                0.70 µs         0.58 - 0.70 µs
+
+    // nasty hack: 1.40 and 1.15 were obtained by dichotomy (strange because the period is OK).
+    uint32_t t0 = top - (F_CPU / (2500000 / 1.40));
+    uint32_t t1 = top - (F_CPU / (1250000 / 1.15));
+
     SysTick->LOAD = top - 1; // Config SysTick for NeoPixel bit freq
     SysTick->VAL = 0;        // Set to start value
     for (;;) {
